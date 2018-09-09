@@ -82,4 +82,14 @@ namespace strike
 		return tuple_get<N>::apply(t);
 	}
 
+	/************************************************************/
+
+	template<typename... Types>
+	auto make_tuple(Types&&... elems)
+	{
+		return tuple<std::decay_t<Types>...>(std::forward<Types>(elems)...);
+	}
+
+	/************************************************************/
+
 } // namespace strike
