@@ -23,9 +23,20 @@ namespace strike
 		{
 		}
 
-		tuple(const Head& head, const Tail&... tail)
-			: head{ head }
-			, tail{ tail... }
+		template<typename T, typename... Ts,
+			typename = std::enable_if_t<sizeof...(Ts) == sizeof...(Tail)>>
+		tuple(T&& t, Ts&&... ts)
+			: head{ std::forward<T>(t) }
+			, tail{ std::forward<Ts>(ts)... }
+		{
+		}
+
+		// copy constructor
+		template<typename T, typename... Ts,
+			typename = std::enable_if_t<sizeof...(Ts) == sizeof...(Tail)>>
+		tuple(const tuple<T, Ts...>& other)
+			: head{ other.get_head() }
+			, tail{ other.get_tail() }
 		{
 		}
 
@@ -49,7 +60,7 @@ namespace strike
 	struct tuple_get
 	{
 		template<typename Head, typename... Tail>
-		static auto apply(const tuple<Head, Tail...> t)
+		static auto apply(const tuple<Head, Tail...>& t)
 		{
 			return tuple_get<N - 1>::apply(t.get_tail());
 		}
@@ -59,7 +70,7 @@ namespace strike
 	struct tuple_get<0>
 	{
 		template<typename Head, typename... Tail>
-		static auto apply(const tuple<Head, Tail...> t)
+		static auto apply(const tuple<Head, Tail...>& t)
 		{
 			return t.get_head();
 		}
